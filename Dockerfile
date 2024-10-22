@@ -48,15 +48,19 @@ RUN apt-get update > /dev/null && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-COPY install-mambaforge.bash /tmp/install-mambaforge.bash
-RUN /tmp/install-mambaforge.bash
+COPY --chown=1000:1000 install-miniforge.bash /tmp/install-miniforge.bash
+RUN /tmp/install-miniforge.bash
+RUN rm -f /tmp/install-miniforge.bash
+
+# needed for building on mac see DH-394
+RUN chown -Rh ${NB_USER}:${NB_USER} ${HOME}
 
 USER ${NB_USER}
 
-COPY environment.yml /tmp/environment.yml
-COPY infra-requirements.txt /tmp/infra-requirements.txt
+COPY --chown=1000:1000 environment.yml /tmp/environment.yml
 RUN mamba env update -p ${CONDA_DIR} -f /tmp/environment.yml && \
         mamba clean -afy
+RUN rm -f /tmp/environment.yml
 
 # DH-327, very similar to what was done for datahub in DH-164
 ENV PLAYWRIGHT_BROWSERS_PATH ${CONDA_DIR}
@@ -103,5 +107,9 @@ RUN install2.r --error --skipinstalled \
 
 # Use simpler locking strategy
 COPY file-locks /etc/rstudio/file-locks
+
+# Doing a little cleanup
+RUN rm -rf /tmp/downloaded_packages
+RUN rm -rf ${HOME}/.cache
 
 ENTRYPOINT ["tini", "--"]
