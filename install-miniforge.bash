@@ -3,10 +3,10 @@
 set -ex
 
 cd $(dirname $0)
-MAMBAFORGE_VERSION='23.1.0-1'
+MINIFORGE_VERSION='24.7.1-2'
 
-URL="https://github.com/conda-forge/miniforge/releases/download/${MAMBAFORGE_VERSION}/Mambaforge-${MAMBAFORGE_VERSION}-Linux-x86_64.sh"
-INSTALLER_PATH=/tmp/mambaforge-installer.sh
+URL="https://github.com/conda-forge/miniforge/releases/download/${MINIFORGE_VERSION}/Miniforge3-${MINIFORGE_VERSION}-Linux-x86_64.sh"
+INSTALLER_PATH=/tmp/miniforge-installer.sh
 
 wget --quiet $URL -O ${INSTALLER_PATH}
 chmod +x ${INSTALLER_PATH}
@@ -33,6 +33,6 @@ rm ${INSTALLER_PATH}
 # Remove the pip cache created as part of installing mambaforge
 rm -rf /root/.cache
 
-chown -R $NB_USER:$NB_USER ${CONDA_DIR}
+chown -Rh $NB_USER:$NB_USER ${CONDA_DIR}
 
 conda list -n root
