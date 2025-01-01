@@ -52,22 +52,25 @@ RUN apt-get update > /dev/null && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-COPY --chown=1000:1000 install-miniforge.bash /tmp/install-miniforge.bash
-RUN /tmp/install-miniforge.bash
-RUN rm -f /tmp/install-miniforge.bash
-
-# needed for building on mac see DH-394
-RUN chown -Rh ${NB_USER}:${NB_USER} ${HOME}
+RUN install -d -o ${NB_USER} -g ${NB_USER} ${CONDA_DIR}
 
 USER ${NB_USER}
+COPY --chown=1000:1000 install-mambaforge.bash /tmp/install-mambaforge.bash
+RUN /tmp/install-mambaforge.bash
+RUN rm -f /tmp/install-mambaforge.bash
 
+USER root
+RUN rm -rf ${HOME}/.cache
+
+USER ${NB_USER}
 COPY --chown=1000:1000 environment.yml /tmp/environment.yml
+
 RUN mamba env update -p ${CONDA_DIR} -f /tmp/environment.yml && \
         mamba clean -afy
 RUN rm -f /tmp/environment.yml
 
 # DH-327, very similar to what was done for datahub in DH-164
-ENV PLAYWRIGHT_BROWSERS_PATH ${CONDA_DIR}
+ENV PLAYWRIGHT_BROWSERS_PATH=${CONDA_DIR}
 RUN playwright install chromium
 
 # Install IRKernel
