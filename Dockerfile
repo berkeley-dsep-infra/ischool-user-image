@@ -1,20 +1,25 @@
-FROM rocker/geospatial:4.4.1
+FROM rocker/geospatial:4.4.2
+# https://github.com/rocker-org/rocker-versioned2/wiki/geospatial_69e6b17dd7e3
 
-ENV NB_USER rstudio
-ENV NB_UID 1000
-ENV CONDA_DIR /srv/conda
+ENV NB_USER=rstudio
+ENV NB_UID=1000
+ENV CONDA_DIR=/srv/conda
 
 # Set ENV for all programs...
-ENV PATH ${CONDA_DIR}/bin:$PATH
+ENV PATH=${CONDA_DIR}/bin:$PATH
+
+# Pick up rocker's default TZ
+ENV TZ=Etc/UTC
 
 # And set ENV for R! It doesn't read from the environment...
+RUN echo "TZ=${TZ}" >> /usr/local/lib/R/etc/Renviron.site
 RUN echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron.site
 
 # Add PATH to /etc/profile so it gets picked up by the terminal
 RUN echo "PATH=${PATH}" >> /etc/profile
 RUN echo "export PATH" >> /etc/profile
 
-ENV HOME /home/${NB_USER}
+ENV HOME=/home/${NB_USER}
 
 WORKDIR ${HOME}
 
@@ -28,7 +33,6 @@ RUN apt-get update > /dev/null && \
             libx11-xcb1 \
             libxtst6 \
             libxrandr2 \
-            libasound2 \
             libpangocairo-1.0-0 \
             libatk1.0-0 \
             libatk-bridge2.0-0 \
@@ -48,22 +52,25 @@ RUN apt-get update > /dev/null && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-COPY --chown=1000:1000 install-miniforge.bash /tmp/install-miniforge.bash
-RUN /tmp/install-miniforge.bash
-RUN rm -f /tmp/install-miniforge.bash
-
-# needed for building on mac see DH-394
-RUN chown -Rh ${NB_USER}:${NB_USER} ${HOME}
+RUN install -d -o ${NB_USER} -g ${NB_USER} ${CONDA_DIR}
 
 USER ${NB_USER}
+COPY --chown=1000:1000 install-mambaforge.bash /tmp/install-mambaforge.bash
+RUN /tmp/install-mambaforge.bash
+RUN rm -f /tmp/install-mambaforge.bash
 
+USER root
+RUN rm -rf ${HOME}/.cache
+
+USER ${NB_USER}
 COPY --chown=1000:1000 environment.yml /tmp/environment.yml
+
 RUN mamba env update -p ${CONDA_DIR} -f /tmp/environment.yml && \
         mamba clean -afy
 RUN rm -f /tmp/environment.yml
 
 # DH-327, very similar to what was done for datahub in DH-164
-ENV PLAYWRIGHT_BROWSERS_PATH ${CONDA_DIR}
+ENV PLAYWRIGHT_BROWSERS_PATH=${CONDA_DIR}
 RUN playwright install chromium
 
 # Install IRKernel
