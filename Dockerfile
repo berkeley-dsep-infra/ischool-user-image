@@ -1,20 +1,25 @@
-FROM rocker/geospatial:4.4.1
+FROM rocker/geospatial:4.4.2
+# https://github.com/rocker-org/rocker-versioned2/wiki/geospatial_69e6b17dd7e3
 
-ENV NB_USER rstudio
-ENV NB_UID 1000
-ENV CONDA_DIR /srv/conda
+ENV NB_USER=rstudio
+ENV NB_UID=1000
+ENV CONDA_DIR=/srv/conda
 
 # Set ENV for all programs...
-ENV PATH ${CONDA_DIR}/bin:$PATH
+ENV PATH=${CONDA_DIR}/bin:$PATH
+
+# Pick up rocker's default TZ
+ENV TZ=Etc/UTC
 
 # And set ENV for R! It doesn't read from the environment...
+RUN echo "TZ=${TZ}" >> /usr/local/lib/R/etc/Renviron.site
 RUN echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron.site
 
 # Add PATH to /etc/profile so it gets picked up by the terminal
 RUN echo "PATH=${PATH}" >> /etc/profile
 RUN echo "export PATH" >> /etc/profile
 
-ENV HOME /home/${NB_USER}
+ENV HOME=/home/${NB_USER}
 
 WORKDIR ${HOME}
 
