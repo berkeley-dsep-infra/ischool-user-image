@@ -55,9 +55,9 @@ RUN apt-get update > /dev/null && \
 RUN install -d -o ${NB_USER} -g ${NB_USER} ${CONDA_DIR}
 
 USER ${NB_USER}
-COPY --chown=1000:1000 install-mambaforge.bash /tmp/install-mambaforge.bash
-RUN /tmp/install-mambaforge.bash
-RUN rm -f /tmp/install-mambaforge.bash
+COPY --chown=1000:1000 install-miniforge.bash /tmp/install-miniforge.bash
+RUN /tmp/install-miniforge.bash
+RUN rm -f /tmp/install-miniforge.bash
 
 USER root
 RUN rm -rf ${HOME}/.cache
