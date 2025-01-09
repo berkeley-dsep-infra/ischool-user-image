@@ -1,12 +1,12 @@
 #!/bin/bash
-# This downloads and installs a pinned version of mambaforge
+# This downloads and installs a pinned version of miniforge
 set -ex
 
 cd $(dirname $0)
-MAMBAFORGE_VERSION='24.11.0-0'
+MINIFORGE_VERSION='24.11.2-1'
 
-URL="https://github.com/conda-forge/miniforge/releases/download/${MAMBAFORGE_VERSION}/Miniforge3-${MAMBAFORGE_VERSION}-Linux-x86_64.sh"
-INSTALLER_PATH=/tmp/mambaforge-installer.sh
+URL="https://github.com/conda-forge/miniforge/releases/download/${MINIFORGE_VERSION}/Miniforge3-${MINIFORGE_VERSION}-Linux-x86_64.sh"
+INSTALLER_PATH=/tmp/miniforge-installer.sh
 
 export XDG_CACHE_HOME=$(mktemp)
 
