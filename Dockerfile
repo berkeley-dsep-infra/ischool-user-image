@@ -48,6 +48,23 @@ RUN apt-get update > /dev/null && \
             texlive-fonts-recommended \
             texlive-lang-chinese \
             texlive-plain-generic \
+            curl \
+            emacs \
+            htop \
+            locales \
+            man \
+            man-db \
+            manpages-dev \
+            manpages-posix \
+            manpages-posix-dev \
+            nano \
+            rsync \
+            screen \
+            tar \
+            tmux \
+            vim \
+            wget \
+            zip \
             tini > /dev/null && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -65,7 +82,7 @@ RUN rm -rf ${HOME}/.cache
 USER ${NB_USER}
 COPY --chown=1000:1000 environment.yml /tmp/environment.yml
 
-RUN mamba env update -p ${CONDA_DIR} -f /tmp/environment.yml && \
+RUN mamba env update -q -p ${CONDA_DIR} -f /tmp/environment.yml && \
         mamba clean -afy
 RUN rm -f /tmp/environment.yml
 
