@@ -79,6 +79,9 @@ RUN rm -f /tmp/install-miniforge.bash
 USER root
 RUN rm -rf ${HOME}/.cache
 
+ENV REPO_DIR=/srv/repo
+COPY --chown=${NB_USER}:${NB_USER} image-tests ${REPO_DIR}/image-tests
+
 USER ${NB_USER}
 COPY --chown=1000:1000 environment.yml /tmp/environment.yml
 
